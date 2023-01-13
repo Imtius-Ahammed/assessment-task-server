@@ -23,11 +23,35 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
   try{
     const taskImageCollection = client.db('taskImage').collection('imageCollection');
+
+
+    //get all images
     app.get('/allImage', async(req,res)=>{
       const query = {};
       const images = await taskImageCollection.find(query).toArray();
       res.send(images);
     })
+
+
+
+
+    //added pagination
+
+    app.get('/imgPagination',async(req,res)=>{
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+      console.log(page,size)
+      const query = {}
+      const cursor = taskImageCollection.find(query);
+      const imgPagination = await cursor.skip(page*size).limit(size).toArray();
+      const count = await taskImageCollection.estimatedDocumentCount();
+      res.send({count,imgPagination});
+    })
+
+
+
+
+
 
 
   }
